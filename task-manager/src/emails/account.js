@@ -5,17 +5,33 @@ const sendgridAPIKey =
 
 sgMail.setApiKey(sendgridAPIKey);
 
-const sendEmail = async function() {
+const sendWelcomeEmail = async (email, name) => {
   try {
     await sgMail.send({
-      to: 'erwinjefly@gmail.com',
+      to: email,
       from: 'erwinjefly@gmail.com',
       subject: 'This is my first creation!',
-      text: 'I hope this one actually get to you.'
+      text: `Welcome to the app, ${name}. Let me know how  ou get along with the app.`
     });
   } catch (error) {
     console.log(`error ${error}`);
   }
 };
 
-sendEmail();
+const sendCancelationEmail = async (email, name) => {
+  try {
+    await sgMail.send({
+      to: email,
+      from: 'erwinjefly@gmail.com',
+      subject: 'Sorry to see you go',
+      text: `Goodbye ${name}. I hope to see you back sometime soon`
+    });
+  } catch (error) {
+    console.log(`error ${error}`);
+  }
+};
+
+module.exports = {
+  sendWelcomeEmail,
+  sendCancelationEmail
+};
