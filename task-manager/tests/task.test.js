@@ -1,7 +1,16 @@
 const request = require('supertest');
 const app = require('../src/app');
 const Task = require('../src/models/task');
-const { userOneId, userOne, setupDatabase } = require('./fixtures/db');
+const {
+  userOneId,
+  userOne,
+  userTwo,
+  setupDatabase,
+  taskOne,
+  taskTwo,
+  taskThree,
+  userTwoId
+} = require('./fixtures/db');
 
 beforeEach(setupDatabase);
 
@@ -16,4 +25,25 @@ test('Should create task for user', async () => {
   const task = await Task.findById(response.body._id);
   expect(task).not.toBeNull();
   expect(task.completed).toEqual(false);
+});
+
+test('Should fecth user tasks for userOne', async () => {
+  const response = await request(app)
+    .get('/tasks')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200);
+
+  expect(response.body.length).toEqual(2);
+});
+
+test('Should not delete other users tasks', async () => {
+  await request(app)
+    .delete(`/tasks/${taskOne._id}`)
+    .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+    .send()
+    .expect(404);
+
+  const task = await Task.findById(taskOne._id);
+  expect(task).not.toBeNull();
 });
